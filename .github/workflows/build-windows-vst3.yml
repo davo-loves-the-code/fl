@@ -26,5 +26,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: White-Noise-Windows-x64-VST3
-          path: build/WhiteNoise_artefacts/Release/VST3/White Noise.vst3
+          path: build/WhiteNoise_artefacts/Release/VST3
           if-no-files-found: error
