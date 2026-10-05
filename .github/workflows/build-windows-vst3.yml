@@ -1,0 +1,30 @@
+name: Build Windows VST3
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows-vst3:
+    runs-on: windows-2022
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Configure x64 build with Clang
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -T ClangCL
+
+      - name: Build Release VST3
+        run: cmake --build build --config Release --parallel 4
+
+      - name: Upload VST3 bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: White-Noise-Windows-x64-VST3
+          path: build/WhiteNoise_artefacts/Release/VST3/White Noise.vst3
+          if-no-files-found: error
