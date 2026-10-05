@@ -16,8 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Configure x64 build with Clang 20
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -T ClangCL "-DCMAKE_VS_GLOBALS=LLVMInstallDir=C:/Program Files/LLVM;LLVMToolsVersion=20.1.8"
+      - name: Configure x64 build
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
 
       - name: Build Release VST3
         run: cmake --build build --config Release --parallel 4

@@ -4,7 +4,7 @@ A minimal JUCE 9 VST3 instrument that generates continuous stereo white noise. I
 
 ## Get the Windows plug-in without installing Visual Studio
 
-The public GitHub repository builds the Windows x64 VST3 with Clang on a free GitHub-hosted Windows runner. Open the **Actions** tab, choose **Build Windows VST3**, and run the workflow. When it finishes, download the `White-Noise-Windows-x64-VST3` artifact and copy the included `White Noise.vst3` folder to **Program Files → Common Files → VST3**. Then scan for plug-ins in FL Studio.
+The public GitHub repository builds the Windows x64 VST3 on a free GitHub-hosted Windows runner. You do not need to install or pay for Visual Studio on your computer. Open the **Actions** tab, choose **Build Windows VST3**, and run the workflow. When it finishes, download the `White-Noise-Windows-x64-VST3` artifact and copy the included `White Noise.vst3` folder to **Program Files → Common Files → VST3**. Then scan for plug-ins in FL Studio.
 
 The workflow also runs automatically when changes are pushed to `main`.
 
