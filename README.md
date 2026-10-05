@@ -2,11 +2,24 @@
 
 A minimal JUCE 9 VST3 instrument that generates continuous stereo white noise. It starts producing audio when loaded and has one output level parameter (0 to 100%). Its generic JUCE editor exposes the parameter without custom UI code.
 
-## Get the Windows plug-in without installing Visual Studio
+## Build and install the Windows VST3
 
-The public GitHub repository builds the Windows x64 VST3 on a free GitHub-hosted Windows runner. You do not need to install or pay for Visual Studio on your computer. Open the **Actions** tab, choose **Build Windows VST3**, and run the workflow. When it finishes, download the `White-Noise-Windows-x64-VST3` artifact and copy the included `White Noise.vst3` folder to **Program Files → Common Files → VST3**. Then scan for plug-ins in FL Studio.
+The easiest route does not require a compiler on your computer. This public repo uses a free GitHub-hosted Windows runner to build the x64 plug-in.
 
-The workflow also runs automatically when changes are pushed to `main`.
+- The build runs automatically when C++ source or build files are pushed to `main`.
+- To build manually, open the repo's **Actions** tab, choose **Build Windows VST3**, and select **Run workflow** on `main`.
+- When the run completes, download its `White-Noise-Windows-x64-VST3` artifact. Inside it, use the `White Noise.vst3` folder; the neighboring `.lib` and `.exp` files are build byproducts.
+- Copy `White Noise.vst3` to `C:/Program Files/Common Files/VST3`.
+- In FL Studio, open **Options → File settings → Manage plugins**, run **Find installed plugins** with **Verify plugins** enabled, then add **White Noise** from **Installed → Generators → VST3**.
+
+The workflow in [`.github/workflows/build-windows-vst3.yml`](.github/workflows/build-windows-vst3.yml) runs these commands on the Windows runner:
+
+```powershell
+cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+cmake --build build --config Release --parallel 4
+```
+
+The VST3 bundle is built at `build/WhiteNoise_artefacts/Release/VST3/White Noise.vst3`. CMake downloads JUCE 9.0.3 during configuration. For public repositories, GitHub's standard Windows-hosted runners are free and unlimited ([runner details](https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories)).
 
 ## Build on Linux
 
