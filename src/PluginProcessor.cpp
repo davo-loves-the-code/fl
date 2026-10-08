@@ -60,6 +60,7 @@ void WhiteNoiseAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 
     auto midiEvent = midiMessages.cbegin();
     const auto midiEnd = midiMessages.cend();
+    juce::MidiMessageMetadata event;
 
     const auto updateNoteState = [this](const juce::MidiMessage& message)
     {
@@ -99,10 +100,9 @@ void WhiteNoiseAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 
     for (int sample = 0; sample < sampleCount; ++sample)
     {
-        while (midiEvent != midiEnd && midiEvent->samplePosition == sample)
+        while (midiEvent.getNextEvent(event) && event.samplePosition == sample)
         {
-            updateNoteState(midiEvent->getMessage());
-            ++midiEvent;
+            updateNoteState(event.getMessage());
         }
 
         const auto gain = smoothedLevel.getNextValue();
@@ -115,11 +115,6 @@ void WhiteNoiseAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
         }
     }
 
-    while (midiEvent != midiEnd)
-    {
-        updateNoteState(midiEvent->getMessage());
-        ++midiEvent;
-    }
 }
 
 juce::AudioProcessorEditor* WhiteNoiseAudioProcessor::createEditor()
