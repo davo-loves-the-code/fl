@@ -45,7 +45,7 @@ bool WhiteNoiseAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts
 }
 
 void WhiteNoiseAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
-                                            juce::MidiBuffer&)
+                                            juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
 
@@ -58,15 +58,67 @@ void WhiteNoiseAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 
     smoothedLevel.setTargetValue(levelParameter->load(std::memory_order_relaxed));
 
+    auto midiEvent = midiMessages.cbegin();
+    const auto midiEnd = midiMessages.cend();
+
+    const auto updateNoteState = [this](const juce::MidiMessage& message)
+    {
+        if (message.isNoteOn())
+        {
+            const auto channel = message.getChannel() - 1;
+            const auto note = message.getNoteNumber();
+            if (!activeNotes[channel][note])
+            {
+                activeNotes[channel][note] = true;
+                ++activeNoteCount;
+            }
+        }
+        else if (message.isNoteOff())
+        {
+            const auto channel = message.getChannel() - 1;
+            const auto note = message.getNoteNumber();
+            if (activeNotes[channel][note])
+            {
+                activeNotes[channel][note] = false;
+                --activeNoteCount;
+            }
+        }
+        else if (message.isAllNotesOff() || message.isAllSoundOff())
+        {
+            const auto channel = message.getChannel() - 1;
+            for (int note = 0; note < 128; ++note)
+            {
+                if (activeNotes[channel][note])
+                {
+                    activeNotes[channel][note] = false;
+                    --activeNoteCount;
+                }
+            }
+        }
+    };
+
     for (int sample = 0; sample < sampleCount; ++sample)
     {
+        while (midiEvent != midiEnd && midiEvent->samplePosition == sample)
+        {
+            updateNoteState(midiEvent->getMessage());
+            ++midiEvent;
+        }
+
         const auto gain = smoothedLevel.getNextValue();
+        const auto noteGate = activeNoteCount > 0 ? 1.0f : 0.0f;
 
         for (int channel = 0; channel < channelCount; ++channel)
         {
             const auto whiteNoise = random.nextFloat() * 2.0f - 1.0f;
-            channels[channel][sample] = whiteNoise * gain;
+            channels[channel][sample] = whiteNoise * gain * noteGate;
         }
+    }
+
+    while (midiEvent != midiEnd)
+    {
+        updateNoteState(midiEvent->getMessage());
+        ++midiEvent;
     }
 }
 

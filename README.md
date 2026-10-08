@@ -1,6 +1,6 @@
 # White Noise POC
 
-A minimal JUCE 9 VST3 instrument that generates continuous stereo white noise. It starts producing audio when loaded and has one output level parameter (0 to 100%). Its generic JUCE editor exposes the parameter without custom UI code.
+A minimal JUCE 9 VST3 instrument that generates stereo white noise while MIDI notes are held. It has one output level parameter (0 to 100%). Its generic JUCE editor exposes the parameter without custom UI code.
 
 ## Build and install the Windows VST3
 
@@ -49,4 +49,4 @@ Copy the bundle to `~/.vst3/`, then rescan plug-ins in your DAW.
 
 ## What the audio code does
 
-For each output sample, the processor draws a fresh uniform random value in `[-1, 1]`, multiplies it by the smoothed Level parameter, and writes it to each channel. It allocates no memory in the audio callback. Noise is generated continuously rather than gated by MIDI notes.
+For each output sample, the processor draws a fresh uniform random value in `[-1, 1]`, multiplies it by the smoothed Level parameter, and writes it to each channel only while at least one MIDI note is held. Note-off and all-notes-off messages stop the noise. It allocates no memory in the audio callback.

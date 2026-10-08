@@ -16,7 +16,7 @@ public:
     bool hasEditor() const override { return true; }
 
     const juce::String getName() const override { return "White Noise"; }
-    bool acceptsMidi() const override { return false; }
+    bool acceptsMidi() const override { return true; }
     bool producesMidi() const override { return false; }
     double getTailLengthSeconds() const override { return 0.0; }
 
@@ -37,6 +37,8 @@ private:
     std::atomic<float>* levelParameter = nullptr;
     juce::Random random;
     juce::SmoothedValue<float> smoothedLevel;
+    bool activeNotes[16][128] {};
+    int activeNoteCount = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WhiteNoiseAudioProcessor)
 };
