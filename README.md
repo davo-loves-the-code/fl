@@ -7,10 +7,17 @@ A minimal JUCE 9 VST3 instrument that generates stereo white noise while MIDI no
 The easiest route does not require a compiler on your computer. This public repo uses a free GitHub-hosted Windows runner to build the x64 plug-in.
 
 - The build runs automatically when C++ source or build files are pushed to `main`.
-- To build manually, open the repo's **Actions** tab, choose **Build Windows VST3**, and select **Run workflow** on `main`.
+- To build manually, open the repo's **Actions** tab, choose **Build Windows VST3**, and select **Run workflow** on the branch containing the changes.
 - When the run completes, download its `White-Noise-Windows-x64-VST3` artifact. Inside it, use the `White Noise.vst3` folder; the neighboring `.lib` and `.exp` files are build byproducts.
-- Copy `White Noise.vst3` to `C:/Program Files/Common Files/VST3`.
+- Install the bundle in `C:/Program Files/Common Files/VST3`, the system-wide VST3 folder. This location is protected by Windows; approve the administrator prompt when copying the bundle there. A per-user alternative is `%LOCALAPPDATA%/Programs/Common/VST3`.
 - In FL Studio, open **Options → File settings → Manage plugins**, run **Find installed plugins** with **Verify plugins** enabled, then add **White Noise** from **Installed → Generators → VST3**.
+
+To install from PowerShell after downloading and extracting the artifact, set `$bundle` to the extracted `White Noise.vst3` folder and run PowerShell as administrator:
+
+```powershell
+$bundle = "C:\path\to\White Noise.vst3"
+Copy-Item -LiteralPath $bundle -Destination "C:\Program Files\Common Files\VST3\White Noise.vst3" -Recurse -Force
+```
 
 The workflow in [`.github/workflows/build-windows-vst3.yml`](.github/workflows/build-windows-vst3.yml) runs these commands on the Windows runner:
 
@@ -21,14 +28,7 @@ cmake --build build --config Release --parallel 4
 
 The VST3 bundle is built at `build/WhiteNoise_artefacts/Release/VST3/White Noise.vst3`. CMake downloads JUCE 9.0.3 during configuration. For public repositories, GitHub's standard Windows-hosted runners are free and unlimited ([runner details](https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories)).
 
-## Copies installed on the Windows workstation
-
-The built bundle has been copied to these locations:
-
-- `C:/Program Files/Common Files/VST3/White Noise.vst3` — the standard Windows VST3 folder used by FL Studio's plug-in scan.
-- `C:/Program Files/Image-Line/FL Studio 2024/Plugins/VST3/White Noise.vst3` — an additional copy placed inside the requested FL Studio installation folder.
-
-Keep the first copy for FL Studio to scan. Image-Line's [plug-in installation guide](https://www.image-line.com/fl-studio-learning/fl-studio-online-manual/html/basics_externalplugins.htm) says VST3 plug-ins belong in the standard Windows VST3 folders, not the FL Studio installation's legacy `Plugins/VST` folder.
+Image-Line's [plug-in installation guide](https://www.image-line.com/fl-studio-learning/fl-studio-online-manual/html/basics_externalplugins.htm) says VST3 plug-ins belong in the standard Windows VST3 folders, not the FL Studio installation's legacy `Plugins/VST` folder.
 
 ## Build on Linux
 
